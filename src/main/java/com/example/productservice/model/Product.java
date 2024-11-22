@@ -1,17 +1,20 @@
 package com.example.productservice.model;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
 
 @Getter
 @Setter
-public class Product
+@Entity
+public class Product extends BaseModel
 {
-	private long id;
-	private String title;
 	private double price;
-	private String desc;
+	private String description;
+	@ManyToOne(cascade = CascadeType.ALL)
 	private Category category;
 	private String image;
 }

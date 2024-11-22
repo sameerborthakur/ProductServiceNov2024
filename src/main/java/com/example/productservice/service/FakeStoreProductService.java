@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpMessageConverterExtractor;
 import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
@@ -58,13 +59,41 @@ public class FakeStoreProductService implements ProductService
 		return mapFakeStoreProductDtoToProduct(updatedFakeStoreProductDto);
 	}
 
+	@Override
+	public Product updateProduct(Long id, Product product)
+	{
+		FakeStoreProductDto fakeStoreProductDto = mapProductToFakeStoreProductDto(product);
+		FakeStoreProductDto updatedProduct = restTemplate.patchForObject("https://fakestoreapi.com/products/" + id, fakeStoreProductDto,
+				FakeStoreProductDto.class);
+		return mapFakeStoreProductDtoToProduct(updatedProduct);
+	}
+
+	@Override
+	public Product deleteProduct(Long id)
+	{
+		ResponseExtractor<ResponseEntity<FakeStoreProductDto>> responseExtractor = restTemplate.responseEntityExtractor(
+				FakeStoreProductDto.class);
+		ResponseEntity<FakeStoreProductDto> deletedProduct = restTemplate.execute("https://fakestoreapi.com/products/" + id,
+				HttpMethod.DELETE, null, responseExtractor);
+		return mapFakeStoreProductDtoToProduct(deletedProduct.getBody());
+	}
+
+	@Override
+	public Product createProduct(Product product)
+	{
+		FakeStoreProductDto	fakeStoreProductDto = mapProductToFakeStoreProductDto(product);
+		FakeStoreProductDto NewProduct = restTemplate.postForObject("https://fakestoreapi.com/products", fakeStoreProductDto,
+				FakeStoreProductDto.class);
+		return mapFakeStoreProductDtoToProduct(NewProduct);
+	}
+
 	private FakeStoreProductDto mapProductToFakeStoreProductDto(Product product)
 	{
 		FakeStoreProductDto fakeStoreProductDto = new FakeStoreProductDto();
 		fakeStoreProductDto.setId(product.getId());
 		fakeStoreProductDto.setTitle(product.getTitle());
 		fakeStoreProductDto.setPrice(product.getPrice());
-		fakeStoreProductDto.setDescription(product.getDesc());;
+		fakeStoreProductDto.setDescription(product.getDescription());;
 		return fakeStoreProductDto;
 	}
 
@@ -73,11 +102,11 @@ public class FakeStoreProductService implements ProductService
 		Product product=new Product();
 		product.setId(fakeStoreProductDto.getId());
 		product.setTitle(fakeStoreProductDto.getTitle());
-		product.setDesc(fakeStoreProductDto.getDescription());
+		product.setDescription(fakeStoreProductDto.getDescription());
 		product.setPrice(fakeStoreProductDto.getPrice());
 		product.setImage(fakeStoreProductDto.getImage());
 		Category category = new Category();
-		category.setId(fakeStoreProductDto.getCategory());
+		category.setTitle(fakeStoreProductDto.getCategory());
 		product.setCategory(category);
 		return product;
 	}
