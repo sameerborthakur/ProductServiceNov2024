@@ -2,12 +2,13 @@ package com.example.productservice.service;
 
 import java.util.List;
 
+import com.example.productservice.exception.ProductNotfoundException;
 import com.example.productservice.model.Product;
 
 
 public interface ProductService
 {
-	Product getProoductById(long id);
+	Product getProductById(long id) throws ProductNotfoundException;
 
 	List<Product> getAllProducts();
 

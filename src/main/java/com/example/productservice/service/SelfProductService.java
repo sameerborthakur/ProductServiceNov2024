@@ -5,8 +5,10 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.example.productservice.exception.ProductNotfoundException;
 import com.example.productservice.model.Category;
 import com.example.productservice.model.Product;
+import com.example.productservice.projection.ProductTitleAndDescription;
 import com.example.productservice.repository.CategoryRepository;
 import com.example.productservice.repository.ProductRepository;
 
@@ -24,9 +26,21 @@ public class SelfProductService implements ProductService
 
 
 	@Override
-	public Product getProoductById(long id)
+	public Product getProductById(long id) throws ProductNotfoundException
 	{
-		return productRepository.findById(id).orElse(null);
+		//ProductTitleAndDescription projection = productRepository.getProductTitleAndDescriptionById(id);
+		ProductTitleAndDescription projection = productRepository.getProductTitleAndDescriptionSQLById(id);
+		Product p = new Product();
+		p.setTitle(projection.getTitle());
+		p.setDescription(projection.getDescription());
+		return p;
+		/*Optional<Product> product = productRepository.findById(id);
+		if(product.isPresent())
+		{
+			return product.get();
+		}else{
+			throw new ProductNotfoundException(100L, "Product with id "+id+" not found");
+		}*/
 	}
 
 	@Override
